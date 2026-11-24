@@ -155,8 +155,11 @@ namespace HundredGame
             {
                 var rt = UIKit.Anchored(_cellsRoot, "Cell" + i, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), _layout.Centers[i], new Vector2(cell, cell));
                 var ring = UIKit.Panel(rt, "Ring", Color.clear);
-                ring.rectTransform.offsetMin = new Vector2(-5f, -5f);
-                ring.rectTransform.offsetMax = new Vector2(5f, 5f);
+                ring.rectTransform.offsetMin = new Vector2(-8f, -8f);
+                ring.rectTransform.offsetMax = new Vector2(8f, 8f);
+                var border = UIKit.Panel(rt, "Border", UIKit.H("B7A387"));
+                border.rectTransform.offsetMin = new Vector2(-3f, -3f);
+                border.rectTransform.offsetMax = new Vector2(3f, 3f);
                 var bg = UIKit.Panel(rt, "Bg", UIKit.Cell);
                 bg.raycastTarget = true;
                 var num = UIKit.Label(rt, "Num", "", fontSize, UIKit.Dark);
@@ -172,6 +175,7 @@ namespace HundredGame
                 if (_board.Value(i) < 0)
                 {
                     bg.color = Color.clear;
+                    border.color = Color.clear;
                     bg.raycastTarget = false;
                 }
             }
