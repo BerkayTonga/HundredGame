@@ -10,7 +10,7 @@ namespace HundredGame
         public int Index;
         public GamePage Owner;
         public RectTransform Rect;
-        public Image Bg, Ring;
+        public Image Bg, Ring, Border;
         public Text Num;
         public void OnPointerClick(PointerEventData e) => Owner.OnCell(Index);
     }
@@ -157,7 +157,7 @@ namespace HundredGame
                 var ring = UIKit.Panel(rt, "Ring", Color.clear);
                 ring.rectTransform.offsetMin = new Vector2(-8f, -8f);
                 ring.rectTransform.offsetMax = new Vector2(8f, 8f);
-                var border = UIKit.Panel(rt, "Border", UIKit.H("B7A387"));
+                var border = UIKit.Panel(rt, "Border", BorderColor);
                 border.rectTransform.offsetMin = new Vector2(-3f, -3f);
                 border.rectTransform.offsetMax = new Vector2(3f, 3f);
                 var bg = UIKit.Panel(rt, "Bg", UIKit.Cell);
@@ -169,6 +169,7 @@ namespace HundredGame
                 view.Rect = rt;
                 view.Bg = bg;
                 view.Ring = ring;
+                view.Border = border;
                 view.Num = num;
                 _cells[i] = view;
                 _phase[i] = _board.X(i) + _board.Y(i) + _board.Z(i) * 3f;
@@ -179,6 +180,16 @@ namespace HundredGame
                     bg.raycastTarget = false;
                 }
             }
+        }
+
+        private static readonly Color BorderColor = UIKit.H("B7A387");
+
+        private static void ClearMark(CellView c)
+        {
+            c.Ring.color = Color.clear;
+            c.Border.color = BorderColor;
+            c.Border.rectTransform.offsetMin = new Vector2(-3f, -3f);
+            c.Border.rectTransform.offsetMax = new Vector2(3f, 3f);
         }
 
         private Vector2 CellPos(int i) => _layout.Centers[i];
@@ -201,7 +212,7 @@ namespace HundredGame
                 c.Bg.color = UIKit.Cell;
                 c.Num.text = "";
             }
-            c.Ring.color = Color.clear;
+            ClearMark(c);
         }
 
         private void RecomputeValid()
@@ -239,7 +250,15 @@ namespace HundredGame
             }
 
             int cur = _board.Current;
-            if (cur >= 0) _cells[cur].Ring.color = new Color(UIKit.Ink.r, UIKit.Ink.g, UIKit.Ink.b, 0.55f + 0.45f * Mathf.Sin(t * 4f));
+            if (cur >= 0)
+            {
+                // the last number pulses a dark outline drawn above its neighbours
+                var cv = _cells[cur];
+                cv.Border.color = Color.Lerp(BorderColor, UIKit.Ink, 0.5f + 0.5f * Mathf.Sin(t * 4f));
+                cv.Border.rectTransform.offsetMin = new Vector2(-5f, -5f);
+                cv.Border.rectTransform.offsetMax = new Vector2(5f, 5f);
+                cv.Rect.SetAsLastSibling();
+            }
         }
 
         // ------------------------------------------------------------------ input
@@ -256,7 +275,7 @@ namespace HundredGame
         private void Placed(int i)
         {
             int n = _board.Count;
-            if (_prevCurrent >= 0) _cells[_prevCurrent].Ring.color = Color.clear;
+            if (_prevCurrent >= 0) ClearMark(_cells[_prevCurrent]);
             _prevCurrent = i;
 
             RefreshCell(i);
@@ -315,7 +334,7 @@ namespace HundredGame
             _ended = false;
             var c = _cells[idx];
             RefreshCell(idx);
-            c.Ring.color = Color.clear;
+            ClearMark(c);
             Anim.Scale(c.Rect, Vector3.one * 1.25f, Vector3.one, 0.25f, Anim.Ease.OutCubic);
             UIFx.Ripple(_fx, CellPos(idx), new Color(UIKit.Ink.r, UIKit.Ink.g, UIKit.Ink.b, 0.2f), _layout.CellSize * 1.6f, _layout.CellSize * 0.6f, 0.3f);
             AudioManager.Sound(Sfx.Undo, 0.8f);
