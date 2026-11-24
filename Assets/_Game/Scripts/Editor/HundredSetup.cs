@@ -70,7 +70,7 @@ namespace HundredGame.Editor
             const int size = 512;
             var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
             var px = new Color[size * size];
-            Color top = UIKit.H("2B2F7A"), bottom = UIKit.H("0A0C24");
+            Color top = UIKit.H("1D3C7A"), bottom = UIKit.H("09101F");
             int[] lit = { 0, 1, 2, 5, 4, 3, 6, 7, 8 };
             const float cell = 118f, gap = 22f;
             float start = (size - (3 * cell + 2 * gap)) * 0.5f;

@@ -30,7 +30,6 @@ namespace HundredGame
         private readonly RectTransform[] _tiles = new RectTransform[3];
         private readonly LogoWave _wave;
         private readonly Text _footer;
-        private readonly RectTransform _subtitle;
         private readonly RectTransform[] _buttons = new RectTransform[3];
 
         public MenuPage(UIManager ui, Transform parent) : base(ui, "Menu", parent)
@@ -60,15 +59,12 @@ namespace HundredGame
             _wave = _logo.gameObject.AddComponent<LogoWave>();
             _wave.Tiles = _tiles;
 
-            var sub = UIKit.Label(Root, "Subtitle", "SAYI BULMACASI", 44, UIKit.Muted);
-            sub.rectTransform.SetAnchored(new Vector2(0.5f, 0.5f), new Vector2(0f, 120f), new Vector2(900f, 80f));
-            _subtitle = sub.rectTransform;
 
             var play = UIKit.PillButton(Root, "Play", "OYNA", UIKit.Teal, new Vector2(720f, 190f), new Vector2(0.5f, 0.5f), new Vector2(0f, -140f), 88);
             play.onClick.AddListener(() => ui.GoTo(ui.Levels, 1));
             _buttons[0] = (RectTransform)play.transform;
 
-            var how = UIKit.PillButton(Root, "How", "Nasıl Oynanır?", UIKit.Violet, new Vector2(420f, 130f), new Vector2(0.5f, 0.5f), new Vector2(-225f, -400f), 38);
+            var how = UIKit.PillButton(Root, "How", "Nasıl Oynanır?", UIKit.H("35508A"), new Vector2(420f, 130f), new Vector2(0.5f, 0.5f), new Vector2(-225f, -400f), 38);
             how.onClick.AddListener(Popup.Help);
             _buttons[1] = (RectTransform)how.transform;
 
@@ -78,6 +74,7 @@ namespace HundredGame
 
             _footer = UIKit.Label(Root, "Footer", "", 34, UIKit.Muted);
             _footer.rectTransform.SetAnchored(new Vector2(0.5f, 0f), new Vector2(0f, 120f), new Vector2(980f, 70f));
+            _footer.gameObject.SetActive(false);
             Refresh();
         }
 
@@ -101,9 +98,6 @@ namespace HundredGame
             }
             Anim.Run(0.6f, e => { if (_wave != null) _wave.Enabled = e; }, null, 0.7f, Anim.Ease.Linear);
 
-            var subColor = _subtitle.GetComponent<Text>();
-            subColor.color = new Color(UIKit.Muted.r, UIKit.Muted.g, UIKit.Muted.b, 0f);
-            Anim.Run(0.5f, e => { if (subColor != null) subColor.color = new Color(UIKit.Muted.r, UIKit.Muted.g, UIKit.Muted.b, e); }, null, 0.55f);
 
             for (int i = 0; i < _buttons.Length; i++)
             {
@@ -129,8 +123,6 @@ namespace HundredGame
             var title = UIKit.Label(Root, "Title", "BÖLÜMLER", 78, Color.white, TextAnchor.MiddleCenter, true);
             title.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -100f), new Vector2(700f, 130f));
 
-            var hint = UIKit.Label(Root, "Hint", "Tüm bölümler açık. İstediğini seç!", 34, UIKit.Muted);
-            hint.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -200f), new Vector2(900f, 60f));
 
             UIKit.Scroll(Root, "Scroll", new Vector2(0f, 40f), new Vector2(0f, -250f), out _content);
         }
@@ -152,10 +144,10 @@ namespace HundredGame
         {
             var def = Levels.All[index];
             var rt = UIKit.Anchored(_content, "Card" + index, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, y), new Vector2(980f, height));
-            var shadow = UIKit.Panel(rt, "Shadow", UIKit.H("0C0F2A"));
+            var shadow = UIKit.Panel(rt, "Shadow", UIKit.H("08101F"));
             shadow.rectTransform.offsetMin = new Vector2(0f, -12f);
             shadow.rectTransform.offsetMax = new Vector2(0f, -12f);
-            var face = UIKit.Panel(rt, "Face", UIKit.H("262E68"));
+            var face = UIKit.Panel(rt, "Face", UIKit.H("243A70"));
             face.raycastTarget = true;
             var btn = rt.gameObject.AddComponent<Button>();
             btn.targetGraphic = face;
@@ -193,9 +185,6 @@ namespace HundredGame
             name.rectTransform.SetAnchored(new Vector2(0f, 1f), new Vector2(0f, -104f), new Vector2(520f, 90f));
             name.rectTransform.pivot = new Vector2(0f, 0.5f);
 
-            var sub = UIKit.Label(info, "Sub", def.Subtitle, 30, UIKit.Muted, TextAnchor.MiddleLeft);
-            sub.rectTransform.SetAnchored(new Vector2(0f, 1f), new Vector2(0f, -164f), new Vector2(520f, 44f));
-            sub.rectTransform.pivot = new Vector2(0f, 0.5f);
 
             // stars
             int stars = SaveData.Stars(index);
@@ -230,13 +219,10 @@ namespace HundredGame
             var rt = UIKit.Anchored(_content, "Soon", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, y), new Vector2(980f, height));
             var face = UIKit.Panel(rt, "Face", new Color(1f, 1f, 1f, 0.05f));
             face.raycastTarget = true;
-            UIKit.Label(rt, "Tag", "BÖLÜM " + (index + 1), 32, UIKit.Muted).rectTransform.SetAnchored(new Vector2(0.5f, 0.5f), new Vector2(0f, 70f), new Vector2(700f, 50f));
-            UIKit.Label(rt, "T", "Çok yakında", 66, new Color(1f, 1f, 1f, 0.55f)).rectTransform.SetAnchored(new Vector2(0.5f, 0.5f), new Vector2(0f, 0f), new Vector2(800f, 100f));
-            UIKit.Label(rt, "S", "Yeni bölümler geliyor", 32, UIKit.Muted).rectTransform.SetAnchored(new Vector2(0.5f, 0.5f), new Vector2(0f, -70f), new Vector2(800f, 50f));
+            UIKit.Label(rt, "T", "Yakında", 66, new Color(1f, 1f, 1f, 0.55f)).rectTransform.SetAnchored(new Vector2(0.5f, 0.5f), new Vector2(0f, 0f), new Vector2(800f, 100f));
             var btn = rt.gameObject.AddComponent<Button>();
             btn.targetGraphic = face;
             btn.transition = Selectable.Transition.None;
-            btn.onClick.AddListener(() => UI.Toast("Yeni bölümler yakında!"));
             Anim.Move(rt, new Vector2(0f, y - 70f), new Vector2(0f, y), 0.5f, Anim.Ease.OutBack, 0.08f * index);
         }
     }

@@ -12,24 +12,24 @@ namespace HundredGame
         // ------------------------------------------------------------------ palette
         public static Color H(string hex) { ColorUtility.TryParseHtmlString("#" + hex, out var c); return c; }
 
-        public static readonly Color BgTop = H("1C2150");
-        public static readonly Color BgBottom = H("090B1F");
-        public static readonly Color Card = H("1B2149");
-        public static readonly Color CardLight = H("2A3270");
-        public static readonly Color Cell = H("232A5E");
+        public static readonly Color BgTop = H("14224A");
+        public static readonly Color BgBottom = H("09101F");
+        public static readonly Color Card = H("172447");
+        public static readonly Color CardLight = H("27396E");
+        public static readonly Color Cell = H("1F3159");
         public static readonly Color Teal = H("2DE2C4");
         public static readonly Color Pink = H("FF5C93");
         public static readonly Color Gold = H("FFC947");
-        public static readonly Color Violet = H("7B5CFF");
+        public static readonly Color Violet = H("3E8BFF");
         public static readonly Color Blue = H("3E8BFF");
         public static readonly Color Muted = H("8F98D0");
-        public static readonly Color Dark = H("10142F");
+        public static readonly Color Dark = H("0E1A33");
 
         /// <summary>Colour of a placed number: sweeps from blue through violet and pink to orange as the count grows.</summary>
         public static Color NumberColor(int n)
         {
             float t = Mathf.Clamp01((n - 1) / 99f);
-            float hue = Mathf.Repeat(0.56f + t * 0.5f, 1f);
+            float hue = 0.58f - t * 0.5f; // blue -> cyan -> green -> yellow -> orange (no purple)
             return Color.HSVToRGB(hue, 0.62f, 1f);
         }
 
@@ -507,7 +507,7 @@ namespace HundredGame
         private void Apply()
         {
             float e = Anim.Ease.InOutSine(_t);
-            _track.color = Color.Lerp(UIKit.H("3A416F"), UIKit.Teal, e);
+            _track.color = Color.Lerp(UIKit.H("3A4A70"), UIKit.Teal, e);
             _knob.anchoredPosition = new Vector2(Mathf.Lerp(36f, 100f, e), 0f);
         }
     }

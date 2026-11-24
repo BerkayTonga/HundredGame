@@ -24,15 +24,15 @@
 3. The squares you can use glow, so you always see your options.
 4. When there are no moves left the game ends. **Your score is the last number you placed.** Reach 100 to win!
 
-Stuck? Use **Undo** to take moves back, **Hint** to highlight a good move, or **Restart**.
+Stuck? Use **Undo** to take moves back, or **Restart**.
 
 ## Features
 
 - **Level select with every level open**, each card shows your best score, stars and a mini-board that fills up with your progress. Unfinished games are saved and can be resumed.
-- **Score system:** current score, best score, number of available moves, a progress bar and 1-3 stars per level.
-- **Glowing legal moves** with the upcoming number shown on them.
-- **Undo, Hint (Warnsdorff-style suggestion), Restart** and automatic saving after every move.
-- **Juicy animations:** pop-in cells, ripples and particle bursts, milestone banners every 10 numbers, shake on invalid taps, animated score count-up, confetti on victory, animated gradient background with floating number tiles.
+- **Score system:** current score, best score and 1-3 stars per level.
+- **Glowing legal moves**.
+- **Undo, Restart** and automatic saving after every move.
+- **Juicy animations:** pop-in cells, ripples and particle bursts, gold bursts every 10 numbers, shake on invalid taps, animated score count-up, confetti on victory, animated gradient background with floating number tiles.
 - **Procedural audio, no audio files:** each number plays a note of a pentatonic scale, so counting up becomes a melody. Jingles, stars, errors and a calm ambient loop are synthesized at startup. Drop your own clips into `Resources/Audio/<SfxName>` to override them.
 - **Mobile ready:** portrait layout, safe-area support, haptics, back button support, settings (sound, music, vibration), how-to-play screen with a visual diagram.
 - Everything is built in code (generated sprites and icons), so the project needs **no third-party assets**.
@@ -82,7 +82,7 @@ The level select, save data, stars and result screens pick it up automatically. 
 ## Test tools
 
 - **HundredGame > Simulate Board** checks the move rules and plays bot games headlessly.
-- **HundredGame > Run Smoke Test** walks through every screen, plays a full game with the hint bot and saves screenshots to `Logs/Smoke`.
+- **HundredGame > Run Smoke Test** walks through every screen, plays a full game with a bot and saves screenshots to `Logs/Smoke`.
 
 ## License
 

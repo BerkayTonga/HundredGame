@@ -34,7 +34,7 @@ namespace HundredGame
             borderImg.color = UIKit.CardLight;
             borderImg.raycastTarget = true;
             Card = UIKit.Rect(border, "Inner", Vector2.zero, Vector2.one, new Vector2(5f, 5f), new Vector2(-5f, -5f));
-            var innerRounded = UIKit.Panel(Card, "Bg", UIKit.H("1A2050"));
+            var innerRounded = UIKit.Panel(Card, "Bg", UIKit.H("162A52"));
             innerRounded.rectTransform.SetAsFirstSibling();
 
             _group.alpha = 0f;
@@ -73,7 +73,7 @@ namespace HundredGame
             Row(c, "Müzik", SaveData.MusicOn, v => { SaveData.MusicOn = v; SaveData.Save(); AudioManager.Instance?.ApplySettings(); }, ref y);
             Row(c, "Titreşim", SaveData.VibrationOn, v => { SaveData.VibrationOn = v; SaveData.Save(); if (v) Haptics.Medium(); }, ref y);
 
-            var reset = UIKit.PillButton(c, "Reset", "İlerlemeyi Sıfırla", UIKit.H("5A3A7A"), new Vector2(620f, 120f), new Vector2(0.5f, 1f), new Vector2(0f, y - 40f), 40);
+            var reset = UIKit.PillButton(c, "Reset", "İlerlemeyi Sıfırla", UIKit.H("7A3C4F"), new Vector2(620f, 120f), new Vector2(0.5f, 1f), new Vector2(0f, y - 40f), 40);
             bool armed = false;
             var resetLabel = reset.GetComponentInChildren<Text>();
             reset.onClick.AddListener(() =>
@@ -108,15 +108,14 @@ namespace HundredGame
 
         public static void Help()
         {
-            var p = new Popup(960f, 1500f);
+            var p = new Popup(940f, 1340f);
             var c = p.Card;
             UIKit.Label(c, "Title", "NASIL OYNANIR?", 68, Color.white, TextAnchor.MiddleCenter, true).rectTransform
                 .SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -90f), new Vector2(860f, 120f));
 
             var body = UIKit.Label(c, "Body",
-                "1'den 100'e kadar sırayla sayıları kutulara yerleştir.\n" +
-                "İlk sayıyı istediğin kutuya koyabilirsin.",
-                36, UIKit.Muted, TextAnchor.UpperCenter);
+                "1'den 100'e kadar sırayla yerleştir.",
+                38, UIKit.Muted, TextAnchor.UpperCenter);
             body.horizontalOverflow = HorizontalWrapMode.Wrap;
             body.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -190f), new Vector2(820f, 130f));
             body.rectTransform.pivot = new Vector2(0.5f, 1f);
@@ -147,13 +146,11 @@ namespace HundredGame
             }
 
             var rules = UIKit.Label(c, "Rules",
-                "Yatay ve dikey: 2 kutu atla (3 kutu ileri)\n" +
-                "Çapraz: 1 kutu atla (2 kutu ileri)\n" +
-                "Parlayan kutular sıradaki sayının gidebileceği yerlerdir.\n" +
-                "Hamlen kalmayınca oyun biter. Skorun ulaştığın son sayıdır!",
-                34, Color.white, TextAnchor.UpperCenter);
+                "Yatay / dikey: 3 kare ileri\n" +
+                "Çapraz: 2 kare ileri",
+                40, Color.white, TextAnchor.UpperCenter);
             rules.horizontalOverflow = HorizontalWrapMode.Wrap;
-            rules.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -360f - size - 70f), new Vector2(840f, 330f));
+            rules.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -360f - size - 70f), new Vector2(840f, 140f));
             rules.rectTransform.pivot = new Vector2(0.5f, 1f);
 
             var close = UIKit.PillButton(c, "Close", "Anladım", UIKit.Teal, new Vector2(560f, 130f), new Vector2(0.5f, 0f), new Vector2(0f, 110f), 54);
@@ -170,7 +167,7 @@ namespace HundredGame
             msg.horizontalOverflow = HorizontalWrapMode.Wrap;
             msg.rectTransform.SetAnchored(new Vector2(0.5f, 0.5f), new Vector2(0f, 20f), new Vector2(740f, 200f));
 
-            var no = UIKit.PillButton(c, "No", "Vazgeç", UIKit.H("4A5290"), new Vector2(340f, 120f), new Vector2(0.5f, 0f), new Vector2(-190f, 110f), 46);
+            var no = UIKit.PillButton(c, "No", "Vazgeç", UIKit.H("3A5080"), new Vector2(340f, 120f), new Vector2(0.5f, 0f), new Vector2(-190f, 110f), 46);
             no.onClick.AddListener(p.Close);
             var ok = UIKit.PillButton(c, "Yes", yes, UIKit.Pink, new Vector2(340f, 120f), new Vector2(0.5f, 0f), new Vector2(190f, 110f), 46);
             ok.onClick.AddListener(() => { p.Close(); onYes?.Invoke(); });

@@ -22,15 +22,15 @@
 3. Gidebileceğin kareler parlar, seçeneklerini hep görürsün.
 4. Hamle kalmayınca oyun biter. **Skorun, koyduğun son sayıdır.** 100'e ulaşırsan kazanırsın!
 
-Sıkıştın mı? **Geri Al** ile hamleleri geri al, **İpucu** ile iyi bir hamleyi gör veya **Yeniden** başla.
+Sıkıştın mı? **Geri Al** ile hamleleri geri al veya **Yeniden** başla.
 
 ## Özellikler
 
 - **Tüm bölümler açık** bölüm seçimi; her kartta rekorun, yıldızların ve ilerlemenle dolan mini tahta görünür. Yarım kalan oyunlar kaydedilir ve devam edilir.
-- **Skor sistemi:** anlık skor, rekor, kalan seçenek sayısı, ilerleme çubuğu ve bölüm başına 1-3 yıldız.
-- **Parlayan geçerli kareler** ve üzerlerinde sıradaki sayı.
-- **Geri Al, İpucu, Yeniden** ve her hamlede otomatik kayıt.
-- **Akıcı animasyonlar:** beliren kareler, dalga ve parçacık efektleri, her 10 sayıda kutlama yazıları, hatalı dokunuşta sarsıntı, sayılan skor, zafer konfetisi, yüzen sayı karolarıyla animasyonlu arka plan.
+- **Skor sistemi:** anlık skor, rekor ve bölüm başına 1-3 yıldız.
+- **Parlayan geçerli kareler**.
+- **Geri Al, Yeniden** ve her hamlede otomatik kayıt.
+- **Akıcı animasyonlar:** beliren kareler, dalga ve parçacık efektleri, her 10 sayıda altın efekt, hatalı dokunuşta sarsıntı, sayılan skor, zafer konfetisi, yüzen sayı karolarıyla animasyonlu arka plan.
 - **Ses dosyası yok, hepsi kodla üretilir:** her sayı pentatonik bir nota çalar, saymak melodiye dönüşür. Efektler ve sakin bir fon müziği açılışta sentezlenir. Kendi seslerini `Resources/Audio/<SesAdı>` içine koyarak değiştirebilirsin.
 - **Mobile hazır:** dikey ekran, güvenli alan desteği, titreşim, geri tuşu, ayarlar (ses, müzik, titreşim) ve görsel anlatımlı "Nasıl Oynanır" ekranı.
 - Her şey kodla üretilir (sprite ve ikonlar dahil), **üçüncü taraf asset gerekmez**.
@@ -80,7 +80,7 @@ Bölüm seçimi, kayıt, yıldızlar ve sonuç ekranları otomatik algılar. `Bl
 ## Test araçları
 
 - **HundredGame > Simulate Board:** hamle kurallarını doğrular, botlarla oyun oynatır.
-- **HundredGame > Run Smoke Test:** tüm ekranları gezer, ipucu botuyla tam bir oyun oynar ve `Logs/Smoke` içine ekran görüntüsü alır.
+- **HundredGame > Run Smoke Test:** tüm ekranları gezer, botla tam bir oyun oynar ve `Logs/Smoke` içine ekran görüntüsü alır.
 
 ## Lisans
 
