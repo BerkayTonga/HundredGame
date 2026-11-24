@@ -106,15 +106,16 @@ namespace HundredGame
             y -= 150f;
         }
 
-        public static void Help()
+        public static void Help(LevelDef def = null)
         {
-            var p = new Popup(940f, 1340f);
+            def = def ?? Levels.All[0];
+            var p = new Popup(940f, 1420f);
             var c = p.Card;
             UIKit.Label(c, "Title", "NASIL OYNANIR?", 68, Color.white, TextAnchor.MiddleCenter, true).rectTransform
                 .SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -90f), new Vector2(860f, 120f));
 
             var body = UIKit.Label(c, "Body",
-                "1'den 100'e kadar sırayla yerleştir.",
+                "Sayıları 1'den başlayarak sırayla yerleştir.",
                 38, UIKit.Muted, TextAnchor.UpperCenter);
             body.horizontalOverflow = HorizontalWrapMode.Wrap;
             body.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -190f), new Vector2(820f, 130f));
@@ -122,23 +123,22 @@ namespace HundredGame
 
             // mini diagram: current cell in the middle, legal targets glowing
             const int grid = 7;
-            float cell = 82f, gap = 8f;
+            float cell = 76f, gap = 8f;
             float size = grid * cell + (grid - 1) * gap;
             var board = UIKit.Anchored(c, "Diagram", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -360f), new Vector2(size + 36f, size + 36f));
             UIKit.Panel(board, "Bg", new Color(0f, 0f, 0.1f, 0.35f));
-            int[] ox = { 3, -3, 0, 0, 2, 2, -2, -2 }, oy = { 0, 0, 3, -3, 2, -2, 2, -2 };
             for (int gy = 0; gy < grid; gy++)
             for (int gx = 0; gx < grid; gx++)
             {
                 int dx = gx - 3, dy = 3 - gy;
                 bool center = dx == 0 && dy == 0, legal = false;
-                for (int i = 0; i < 8; i++) if (ox[i] == dx && oy[i] == dy) legal = true;
+                foreach (var o in def.Offsets) if (o[2] == 0 && o[0] == dx && o[1] == dy) legal = true;
                 var rt = UIKit.Anchored(board, "C", new Vector2(0f, 1f), new Vector2(0f, 1f),
                     new Vector2(18f + gx * (cell + gap), -18f - gy * (cell + gap)), new Vector2(cell, cell));
                 var img = rt.gameObject.AddComponent<Image>();
                 img.sprite = UIKit.Rounded;
                 img.type = Image.Type.Sliced;
-                img.color = center ? UIKit.NumberColor(12) : legal ? new Color(UIKit.Teal.r, UIKit.Teal.g, UIKit.Teal.b, 0.85f) : UIKit.Cell;
+                img.color = center ? UIKit.NumberColor(12, 100) : legal ? new Color(UIKit.Teal.r, UIKit.Teal.g, UIKit.Teal.b, 0.85f) : UIKit.Cell;
                 img.raycastTarget = false;
                 if (center) UIKit.Label(rt, "N", "5", 40, UIKit.Dark);
                 else if (legal) UIKit.Label(rt, "N", "6", 36, UIKit.Dark);
@@ -146,8 +146,7 @@ namespace HundredGame
             }
 
             var rules = UIKit.Label(c, "Rules",
-                "Yatay / dikey: 3 kare ileri\n" +
-                "Çapraz: 2 kare ileri",
+                def.Rule,
                 40, Color.white, TextAnchor.UpperCenter);
             rules.horizontalOverflow = HorizontalWrapMode.Wrap;
             rules.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -360f - size - 70f), new Vector2(840f, 140f));

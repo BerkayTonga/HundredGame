@@ -65,7 +65,7 @@ namespace HundredGame
             _buttons[0] = (RectTransform)play.transform;
 
             var how = UIKit.PillButton(Root, "How", "Nasıl Oynanır?", UIKit.H("35508A"), new Vector2(420f, 130f), new Vector2(0.5f, 0.5f), new Vector2(-225f, -400f), 38);
-            how.onClick.AddListener(Popup.Help);
+            how.onClick.AddListener(() => Popup.Help(null));
             _buttons[1] = (RectTransform)how.transform;
 
             var settings = UIKit.PillButton(Root, "Settings", "Ayarlar", UIKit.Blue, new Vector2(420f, 130f), new Vector2(0.5f, 0.5f), new Vector2(225f, -400f), 42);
@@ -159,21 +159,25 @@ namespace HundredGame
             int best = SaveData.Best(index);
 
             // progress preview: the grid fills with colour as the best score grows
-            float cell = 21f, g = 3f, size = def.Size * cell + (def.Size - 1) * g;
-            var preview = UIKit.Anchored(face.transform, "Preview", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(46f, 0f), new Vector2(size + 28f, size + 28f));
-            UIKit.Panel(preview, "Bg", new Color(0f, 0f, 0.1f, 0.4f));
-            for (int n = 0; n < def.Size * def.Size; n++)
+            const float size = 240f;
+            var preview = UIKit.Anchored(face.transform, "Preview", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(46f, 0f), new Vector2(size, size));
+            UIKit.Panel(preview, "Bg", new Color(0f, 0f, 0.08f, 0.45f));
+            var layout = BoardLayout.Create(def, size, 10f, 3f, 0f);
+            var blocked = new System.Collections.Generic.HashSet<int>(def.Blocked);
+            int order = 0;
+            for (int n = 0; n < def.Cells; n++)
             {
-                int cx = n % def.Size, cy = n / def.Size;
-                var c = UIKit.Anchored(preview, "c", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(14f + cx * (cell + g), -14f - cy * (cell + g)), new Vector2(cell, cell));
+                if (blocked.Contains(n)) continue;
+                var c = UIKit.Anchored(preview, "c", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), layout.Centers[n], new Vector2(layout.CellSize, layout.CellSize));
                 var img = c.gameObject.AddComponent<Image>();
                 img.sprite = UIKit.Rounded;
                 img.type = Image.Type.Sliced;
-                img.color = n < best ? UIKit.NumberColor(n + 1) : UIKit.Cell;
+                img.color = order < best ? UIKit.NumberColor(order + 1, def.Goal) : UIKit.Cell;
                 img.raycastTarget = false;
+                order++;
             }
 
-            float left = 46f + size + 28f + 40f;
+            float left = 46f + size + 40f;
             var info = UIKit.Rect(face.transform, "Info", Vector2.zero, Vector2.one, new Vector2(left, 0f), new Vector2(-30f, 0f));
 
             var tag = UIKit.Label(info, "Tag", "BÖLÜM " + (index + 1), 32, UIKit.Teal, TextAnchor.MiddleLeft);
@@ -185,6 +189,9 @@ namespace HundredGame
             name.rectTransform.SetAnchored(new Vector2(0f, 1f), new Vector2(0f, -104f), new Vector2(520f, 90f));
             name.rectTransform.pivot = new Vector2(0f, 0.5f);
 
+            var sub = UIKit.Label(info, "Sub", def.Subtitle, 30, UIKit.Muted, TextAnchor.MiddleLeft);
+            sub.rectTransform.SetAnchored(new Vector2(0f, 1f), new Vector2(0f, -164f), new Vector2(560f, 44f));
+            sub.rectTransform.pivot = new Vector2(0f, 0.5f);
 
             // stars
             int stars = SaveData.Stars(index);

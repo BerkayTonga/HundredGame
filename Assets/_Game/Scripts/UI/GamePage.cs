@@ -31,9 +31,10 @@ namespace HundredGame
         public Board Board => _board;
         private int _level;
         private CellView[] _cells;
+        private float[] _phase;
         private bool[] _valid;
         private readonly List<int> _moves = new List<int>();
-        private float _cellSize;
+        private BoardLayout _layout;
 
         private readonly RectTransform _boardRt, _cellsRoot, _fx;
         private readonly Text _title, _score, _best;
@@ -47,23 +48,25 @@ namespace HundredGame
             back.onClick.AddListener(() => ui.GoTo(ui.Levels, -1));
             var gear = UIKit.IconButton(Root, "Gear", UIKit.Icon("gear"), UIKit.CardLight, 120f, new Vector2(1f, 1f), new Vector2(-90f, -100f));
             gear.onClick.AddListener(Popup.Settings);
+            var help = UIKit.IconButton(Root, "Help", UIKit.Icon("help"), UIKit.CardLight, 120f, new Vector2(1f, 1f), new Vector2(-230f, -100f));
+            help.onClick.AddListener(() => Popup.Help(_board != null ? _board.Def : null));
+            Object.Destroy(help.transform.Find("Face/Icon").gameObject);
+            UIKit.Label(help.transform.Find("Face"), "Q", "?", 72, Color.white);
 
             _title = UIKit.Label(Root, "Title", "", 52, Color.white, TextAnchor.MiddleCenter, true);
-            _title.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -100f), new Vector2(520f, 100f));
+            _title.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(-20f, -100f), new Vector2(440f, 100f));
 
             Stat("Score", "SKOR", -260f, out _score);
             Stat("Best", "REKOR", 260f, out _best);
 
-            // board
             _boardRt = UIKit.Anchored(Root, "Board", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -30f), new Vector2(BoardPixels, BoardPixels));
-            var edge = UIKit.Panel(_boardRt, "Edge", UIKit.H("34508F"));
+            var edge = UIKit.Panel(_boardRt, "Edge", UIKit.H("1E2D52"));
             edge.rectTransform.offsetMin = new Vector2(-4f, -4f);
             edge.rectTransform.offsetMax = new Vector2(4f, 4f);
-            UIKit.Panel(_boardRt, "Bg", UIKit.H("0F1B38"));
+            UIKit.Panel(_boardRt, "Bg", UIKit.H("0A1226"));
             _cellsRoot = UIKit.Fill(_boardRt, "Cells");
             _fx = UIKit.Fill(_boardRt, "Fx");
 
-            // actions
             var undo = UIKit.ActionButton(Root, "Undo", UIKit.Icon("undo"), "Geri Al", UIKit.Blue, new Vector2(340f, 150f), new Vector2(0.5f, 0f), new Vector2(-200f, 170f));
             undo.onClick.AddListener(Undo);
             var restart = UIKit.ActionButton(Root, "Restart", UIKit.Icon("restart"), "Yeniden", UIKit.Pink, new Vector2(340f, 150f), new Vector2(0.5f, 0f), new Vector2(200f, 170f));
@@ -75,7 +78,7 @@ namespace HundredGame
         private void Stat(string name, string label, float x, out Text value)
         {
             var rt = UIKit.Anchored(Root, name, new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f), new Vector2(x, -270f), new Vector2(480f, 130f));
-            UIKit.Panel(rt, "Shadow", UIKit.H("08101F")).rectTransform.offsetMin = new Vector2(0f, -8f);
+            UIKit.Panel(rt, "Shadow", UIKit.H("060A16")).rectTransform.offsetMin = new Vector2(0f, -8f);
             UIKit.Panel(rt, "Face", UIKit.Card);
             var l = UIKit.Label(rt, "Label", label, 28, UIKit.Muted, TextAnchor.MiddleLeft);
             l.rectTransform.SetAnchored(new Vector2(0f, 0.5f), new Vector2(150f, 0f), new Vector2(240f, 60f));
@@ -107,29 +110,50 @@ namespace HundredGame
         {
             if (!_intro) return;
             _intro = false;
-            int n = _board.Size;
             for (int i = 0; i < _cells.Length; i++)
             {
                 var rt = _cells[i].Rect;
                 rt.localScale = Vector3.zero;
-                Anim.Pop(rt, 0f, 1f, 0.45f, 0.15f + (i % n + i / n) * 0.022f);
+                Anim.Pop(rt, 0f, 1f, 0.45f, 0.15f + _phase[i] * 0.022f);
+            }
+
+            // show the rules the first time a level is opened
+            if (!SaveData.SeenRules(_level))
+            {
+                SaveData.MarkRulesSeen(_level);
+                var def = _board.Def;
+                Anim.After(0.9f, () => { if (!UI.PopupOpen) Popup.Help(def); });
             }
         }
 
         private void BuildGrid()
         {
             for (int i = _cellsRoot.childCount - 1; i >= 0; i--) Object.Destroy(_cellsRoot.GetChild(i).gameObject);
-            int n = _board.Size;
-            _cellSize = (BoardPixels - 2f * Pad - Gap * (n - 1)) / n;
-            _cells = new CellView[n * n];
-            _valid = new bool[n * n];
-            int fontSize = Mathf.RoundToInt(_cellSize * 0.52f);
-            for (int i = 0; i < n * n; i++)
+            var def = _board.Def;
+            _layout = BoardLayout.Create(def, BoardPixels, Pad, Gap, 40f);
+            int total = _board.CellCount;
+            _cells = new CellView[total];
+            _valid = new bool[total];
+            _phase = new float[total];
+
+            for (int z = 0; z < _layout.Layers.Length; z++)
             {
-                int x = i % n, y = i / n;
-                var rt = UIKit.Anchored(_cellsRoot, "Cell" + i, new Vector2(0f, 1f), new Vector2(0.5f, 0.5f),
-                    new Vector2(Pad + _cellSize * 0.5f + x * (_cellSize + Gap), -(Pad + _cellSize * 0.5f + y * (_cellSize + Gap))),
-                    new Vector2(_cellSize, _cellSize));
+                var r = _layout.Layers[z];
+                var panel = UIKit.Anchored(_cellsRoot, "Layer" + z, new Vector2(0.5f, 0.5f), new Vector2(0f, 0f), new Vector2(r.xMin, r.yMin), new Vector2(r.width, r.height));
+                UIKit.Panel(panel, "Bg", UIKit.H("0F1A33"));
+                var label = UIKit.Label(panel, "Label", "KAT " + (z + 1), 26, UIKit.Muted, TextAnchor.MiddleLeft);
+                label.rectTransform.anchorMin = new Vector2(0f, 1f);
+                label.rectTransform.anchorMax = new Vector2(1f, 1f);
+                label.rectTransform.pivot = new Vector2(0.5f, 1f);
+                label.rectTransform.sizeDelta = new Vector2(-40f, 40f);
+                label.rectTransform.anchoredPosition = new Vector2(0f, -8f);
+            }
+
+            float cell = _layout.CellSize;
+            int fontSize = Mathf.RoundToInt(cell * 0.52f);
+            for (int i = 0; i < total; i++)
+            {
+                var rt = UIKit.Anchored(_cellsRoot, "Cell" + i, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), _layout.Centers[i], new Vector2(cell, cell));
                 var ring = UIKit.Panel(rt, "Ring", Color.clear);
                 ring.rectTransform.offsetMin = new Vector2(-5f, -5f);
                 ring.rectTransform.offsetMax = new Vector2(5f, 5f);
@@ -144,20 +168,16 @@ namespace HundredGame
                 view.Ring = ring;
                 view.Num = num;
                 _cells[i] = view;
+                _phase[i] = _board.X(i) + _board.Y(i) + _board.Z(i) * 3f;
                 if (_board.Value(i) < 0)
                 {
-                    bg.color = new Color(1f, 1f, 1f, 0.04f);
+                    bg.color = Color.clear;
                     bg.raycastTarget = false;
                 }
             }
         }
 
-        private Vector2 CellPos(int i)
-        {
-            int n = _board.Size, x = i % n, y = i / n;
-            return new Vector2(Pad + _cellSize * 0.5f + x * (_cellSize + Gap) - BoardPixels * 0.5f,
-                               BoardPixels * 0.5f - (Pad + _cellSize * 0.5f + y * (_cellSize + Gap)));
-        }
+        private Vector2 CellPos(int i) => _layout.Centers[i];
 
         // ------------------------------------------------------------------ rendering
         private void RefreshCell(int i)
@@ -167,9 +187,9 @@ namespace HundredGame
             if (v < 0) return;
             if (v > 0)
             {
-                c.Bg.color = UIKit.NumberColor(v);
+                c.Bg.color = UIKit.NumberColor(v, _board.Def.Goal);
                 c.Num.text = v.ToString();
-                c.Num.fontSize = Mathf.RoundToInt(_cellSize * (v >= 100 ? 0.42f : 0.52f));
+                c.Num.fontSize = Mathf.RoundToInt(_layout.CellSize * (v >= 100 ? 0.42f : 0.52f));
                 c.Num.color = UIKit.Dark;
             }
             else
@@ -204,14 +224,13 @@ namespace HundredGame
             if (_cells == null || _board == null) return;
             float t = Time.unscaledTime;
             bool first = _board.Count == 0;
-            int n = _board.Size;
 
             // legal cells breathe softly (no text, just a gentle glow)
             foreach (int i in _moves)
             {
                 float k = first
-                    ? 0.06f + 0.05f * Mathf.Sin(t * 2f - (i % n + i / n) * 0.5f)
-                    : 0.22f + 0.1f * Mathf.Sin(t * 3f + i * 0.7f);
+                    ? 0.05f + 0.04f * Mathf.Sin(t * 2f - _phase[i] * 0.5f)
+                    : 0.2f + 0.09f * Mathf.Sin(t * 3f + i * 0.7f);
                 _cells[i].Bg.color = Color.Lerp(UIKit.Cell, UIKit.Teal, k);
             }
 
@@ -238,9 +257,10 @@ namespace HundredGame
 
             RefreshCell(i);
             var c = _cells[i];
-            Color col = UIKit.NumberColor(n);
+            float cell = _layout.CellSize;
+            Color col = UIKit.NumberColor(n, _board.Def.Goal);
             Anim.Scale(c.Rect, Vector3.one * 0.35f, Vector3.one, 0.38f, Anim.Ease.OutBack);
-            UIFx.Ripple(_fx, CellPos(i), new Color(col.r, col.g, col.b, 0.5f), _cellSize * 0.8f, _cellSize * 2.4f, 0.45f);
+            UIFx.Ripple(_fx, CellPos(i), new Color(col.r, col.g, col.b, 0.45f), cell * 0.8f, cell * 2.4f, 0.45f);
             UIFx.Burst(_fx, CellPos(i), col, 6, 240f, 14f, 0.45f);
 
             AudioManager.Sound(Sfx.Place, 0.9f, AudioManager.NotePitch(n), 0.02f);
@@ -255,9 +275,8 @@ namespace HundredGame
             RecomputeValid();
             UpdateStats(true);
 
-            if (_board.Won) { Win(); return; }
-            if (_board.Stuck) { Lose(); return; }
-            if (n % 10 == 0) Milestone(i);
+            if (_board.Won) Win();
+            else if (_board.Stuck) Lose();
         }
 
         private void Invalid(int i)
@@ -278,22 +297,14 @@ namespace HundredGame
                 c.Rect.anchoredPosition = home + new Vector2(Mathf.Sin(e * 38f) * (1f - e) * 11f, 0f);
                 if (!_valid[i] && _board.Value(i) >= 0)
                 {
-                    Color baseCol = _board.Value(i) > 0 ? UIKit.NumberColor(_board.Value(i)) : UIKit.Cell;
+                    Color baseCol = _board.Value(i) > 0 ? UIKit.NumberColor(_board.Value(i), _board.Def.Goal) : UIKit.Cell;
                     c.Bg.color = Color.Lerp(from, baseCol, e);
                 }
             }, () => { if (c != null) { c.Rect.anchoredPosition = home; if (!_valid[i]) RefreshCell(i); } }, 0f, Anim.Ease.Linear);
         }
 
-        private void Milestone(int cell)
-        {
-            AudioManager.Sound(Sfx.Milestone, 0.9f);
-            Haptics.Medium();
-            UIFx.Burst(_fx, CellPos(cell), UIKit.Gold, 22, 560f, 20f, 0.8f);
-            UIFx.Ripple(_fx, CellPos(cell), new Color(UIKit.Gold.r, UIKit.Gold.g, UIKit.Gold.b, 0.5f), _cellSize, _cellSize * 4f, 0.7f);
-        }
-
         // ------------------------------------------------------------------ actions
-        private void Undo()
+        public void Undo()
         {
             if (_board == null || _board.Count == 0) return;
             int idx = _board.Undo();
@@ -302,7 +313,7 @@ namespace HundredGame
             RefreshCell(idx);
             c.Ring.color = Color.clear;
             Anim.Scale(c.Rect, Vector3.one * 1.25f, Vector3.one, 0.25f, Anim.Ease.OutCubic);
-            UIFx.Ripple(_fx, CellPos(idx), new Color(1f, 1f, 1f, 0.3f), _cellSize * 1.6f, _cellSize * 0.6f, 0.3f);
+            UIFx.Ripple(_fx, CellPos(idx), new Color(1f, 1f, 1f, 0.3f), _layout.CellSize * 1.6f, _layout.CellSize * 0.6f, 0.3f);
             AudioManager.Sound(Sfx.Undo, 0.8f);
             Haptics.Light();
 
@@ -328,11 +339,10 @@ namespace HundredGame
             _bestAtStart = SaveData.Best(_level);
             SaveData.SetProgress(_level, "");
             SaveData.Save();
-            int n = _board.Size;
             for (int i = 0; i < _cells.Length; i++)
             {
                 RefreshCell(i);
-                Anim.Pop(_cells[i].Rect, 0.2f, 1f, 0.4f, (i % n + i / n) * 0.02f);
+                Anim.Pop(_cells[i].Rect, 0.2f, 1f, 0.4f, _phase[i] * 0.02f);
             }
             RecomputeValid();
             UpdateStats(false);
@@ -370,7 +380,7 @@ namespace HundredGame
             if (!_ended || UI.PopupOpen) return;
             int score = _board.Count, goal = _board.Def.Goal;
             bool record = score > _bestAtStart;
-            var p = new Popup(900f, 1160f, false);
+            var p = new Popup(900f, 1160f);
             var c = p.Card;
 
             var title = UIKit.Label(c, "Title", win ? "TEBRİKLER!" : "HAMLE KALMADI", win ? 80 : 66, win ? UIKit.Gold : Color.white, TextAnchor.MiddleCenter, true);
@@ -383,12 +393,12 @@ namespace HundredGame
             of.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -490f), new Vector2(500f, 70f));
             Anim.Run(0.9f, e => { if (num != null) num.text = Mathf.RoundToInt(score * e).ToString(); }, null, 0.25f, Anim.Ease.OutCubic);
 
-            var def = _board.Def;
+            var thresholds = _board.Def.Stars;
             int stars = 0;
-            for (int s = 0; s < def.StarScores.Length; s++) if (score >= def.StarScores[s]) stars = s + 1;
+            for (int s = 0; s < thresholds.Length; s++) if (score >= thresholds[s]) stars = s + 1;
             for (int s = 0; s < 3; s++)
             {
-                var star = UIKit.Sprite_(c, "Star" + s, UIKit.Star, s < stars ? UIKit.Gold : new Color(1f, 1f, 1f, 0.14f));
+                var star = UIKit.Sprite_(c, "Star" + s, UIKit.Star, s < stars ? UIKit.Gold : new Color(1f, 1f, 1f, 0.12f));
                 star.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2((s - 1) * 150f, -620f - (s == 1 ? -20f : 0f)), new Vector2(s == 1 ? 140f : 120f, s == 1 ? 140f : 120f));
                 if (s < stars)
                 {
@@ -414,12 +424,22 @@ namespace HundredGame
                 info.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -770f), new Vector2(700f, 80f));
             }
 
-            var again = UIKit.PillButton(c, "Again", "Tekrar Oyna", UIKit.Teal, new Vector2(660f, 130f), new Vector2(0.5f, 0f), new Vector2(0f, 300f), 54);
+            var again = UIKit.PillButton(c, "Again", "Tekrar Oyna", UIKit.Teal, new Vector2(660f, 130f), new Vector2(0.5f, 0f), new Vector2(0f, 250f), 54);
             again.onClick.AddListener(() => { p.Close(); DoRestart(); });
-            var levels = UIKit.PillButton(c, "Levels", "Bölümler", UIKit.H("35508A"), new Vector2(660f, 110f), new Vector2(0.5f, 0f), new Vector2(0f, 165f), 44);
-            levels.onClick.AddListener(() => { p.Close(); UI.GoTo(UI.Levels, -1); });
-            var view = UIKit.PillButton(c, "View", "Tahtayı Gör", UIKit.H("27396E"), new Vector2(440f, 90f), new Vector2(0.5f, 0f), new Vector2(0f, 50f), 36);
-            view.onClick.AddListener(p.Close);
+
+            if (win)
+            {
+                var levels = UIKit.PillButton(c, "Levels", "Bölümler", UIKit.H("35508A"), new Vector2(660f, 120f), new Vector2(0.5f, 0f), new Vector2(0f, 100f), 46);
+                levels.onClick.AddListener(() => { p.Close(); UI.GoTo(UI.Levels, -1); });
+            }
+            else
+            {
+                // nothing left to place: restart, or step back and try another route
+                var undo = UIKit.PillButton(c, "Undo", "Geri Al", UIKit.Blue, new Vector2(320f, 120f), new Vector2(0.5f, 0f), new Vector2(-170f, 100f), 46);
+                undo.onClick.AddListener(() => { p.Close(); Undo(); });
+                var levels = UIKit.PillButton(c, "Levels", "Bölümler", UIKit.H("35508A"), new Vector2(320f, 120f), new Vector2(0.5f, 0f), new Vector2(170f, 100f), 40);
+                levels.onClick.AddListener(() => { p.Close(); UI.GoTo(UI.Levels, -1); });
+            }
 
             if (win)
             {

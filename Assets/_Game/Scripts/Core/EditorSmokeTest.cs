@@ -17,6 +17,8 @@ namespace HundredGame
             _dir = Path.Combine(Directory.GetCurrentDirectory(), "Logs", "Smoke");
             Directory.CreateDirectory(_dir);
             yield return new WaitForSeconds(3f);
+            SaveData.MarkRulesSeen(0);
+            SaveData.MarkRulesSeen(4);
 
             _cam = Camera.main;
             _cam.cullingMask = ~0;
@@ -61,7 +63,7 @@ namespace HundredGame
                 if (c == 14)
                 {
                     // wrong tap -> shake + toast
-                    for (int i = 0; i < 100; i++) if (game.Board.Value(i) == 0 && !game.Board.CanPlace(i)) { game.OnCell(i); break; }
+                    for (int i = 0; i < game.Board.CellCount; i++) if (game.Board.Value(i) == 0 && !game.Board.CanPlace(i)) { game.OnCell(i); break; }
                     yield return new WaitForSeconds(0.12f);
                     yield return Shot("game_invalid");
                     yield return new WaitForSeconds(0.5f);
@@ -73,8 +75,45 @@ namespace HundredGame
             Debug.Log("[Smoke] game ended count=" + game.Board.Count + " won=" + game.Board.Won);
             yield return new WaitForSeconds(game.Board.Won ? 3.2f : 2.8f);
             yield return Shot("result");
+
+            // other variations: cube (3D) and a random game on the ring that ends in "no moves left"
+            UIManager.I.Back();
+            yield return new WaitForSeconds(0.5f);
+            UIManager.I.GoTo(UIManager.I.Levels, -1);
+            yield return new WaitForSeconds(1.4f);
+            yield return Shot("levels2");
+
+            UIManager.I.OpenLevel(1);
+            yield return new WaitForSeconds(2.4f);
+            yield return Shot("cube_rules");
+            UIManager.I.Back();
+            yield return new WaitForSeconds(0.5f);
+            for (int k = 0; k < 14; k++) { game.OnCell(game.Board.Hint()); yield return new WaitForSeconds(0.1f); }
+            yield return new WaitForSeconds(0.4f);
+            yield return Shot("cube");
+
+            UIManager.I.GoTo(UIManager.I.Levels, -1);
+            yield return new WaitForSeconds(1.2f);
+            UIManager.I.OpenLevel(4);
+            yield return new WaitForSeconds(2.4f);
+            UIManager.I.Back();
+            yield return new WaitForSeconds(0.5f);
+            var rng = new System.Random(3);
+            var moves = new System.Collections.Generic.List<int>();
+            guard = 0;
+            while (!game.Board.Stuck && !game.Board.Won && guard++ < 200)
+            {
+                game.Board.Moves(moves);
+                if (moves.Count == 0) break;
+                game.OnCell(moves[rng.Next(moves.Count)]);
+                yield return new WaitForSeconds(0.06f);
+            }
+            yield return new WaitForSeconds(2.2f);
+            yield return Shot("lose");
+            Debug.Log("[Smoke] ring random ended at " + game.Board.Count);
             Debug.Log("[Smoke] finished");
-            UnityEditor.EditorApplication.Exit(0);
+            if (System.Environment.CommandLine.Contains("-executeMethod")) UnityEditor.EditorApplication.Exit(0);
+            else UnityEditor.EditorApplication.isPlaying = false;
         }
 
         private IEnumerator Shot(string name)

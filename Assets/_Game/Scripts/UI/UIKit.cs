@@ -12,11 +12,11 @@ namespace HundredGame
         // ------------------------------------------------------------------ palette
         public static Color H(string hex) { ColorUtility.TryParseHtmlString("#" + hex, out var c); return c; }
 
-        public static readonly Color BgTop = H("14224A");
-        public static readonly Color BgBottom = H("09101F");
-        public static readonly Color Card = H("172447");
-        public static readonly Color CardLight = H("27396E");
-        public static readonly Color Cell = H("1F3159");
+        public static readonly Color BgTop = H("0F1A36");
+        public static readonly Color BgBottom = H("070C1A");
+        public static readonly Color Card = H("131D3A");
+        public static readonly Color CardLight = H("22345F");
+        public static readonly Color Cell = H("141F3D");
         public static readonly Color Teal = H("2DE2C4");
         public static readonly Color Pink = H("FF5C93");
         public static readonly Color Gold = H("FFC947");
@@ -25,12 +25,21 @@ namespace HundredGame
         public static readonly Color Muted = H("8F98D0");
         public static readonly Color Dark = H("0E1A33");
 
-        /// <summary>Colour of a placed number: sweeps from blue through violet and pink to orange as the count grows.</summary>
-        public static Color NumberColor(int n)
+        private static readonly Color[] Ramp =
         {
-            float t = Mathf.Clamp01((n - 1) / 99f);
-            float hue = 0.58f - t * 0.5f; // blue -> cyan -> green -> yellow -> orange (no purple)
-            return Color.HSVToRGB(hue, 0.62f, 1f);
+            H("5CB6FF"), // sky blue
+            H("4FD8C4"), // mint
+            H("A4E070"), // lime
+            H("FFCB5E"), // amber
+            H("FF8F6B"), // coral
+        };
+
+        /// <summary>Colour of a placed number: a soft ramp from sky blue through mint and lime to amber and coral.</summary>
+        public static Color NumberColor(int n, int goal = 100)
+        {
+            float t = Mathf.Clamp01((n - 1) / (float)Mathf.Max(1, goal - 1)) * (Ramp.Length - 1);
+            int i = Mathf.Min((int)t, Ramp.Length - 2);
+            return Color.Lerp(Ramp[i], Ramp[i + 1], t - i);
         }
 
         // ------------------------------------------------------------------ fonts & sprites

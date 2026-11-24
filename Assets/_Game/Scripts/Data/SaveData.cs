@@ -19,11 +19,15 @@ namespace HundredGame
         public static string Progress(int level) => PlayerPrefs.GetString("prog_" + level, "");
         public static void SetProgress(int level, string history) => PlayerPrefs.SetString("prog_" + level, history);
 
+        public static bool SeenRules(int level) => PlayerPrefs.GetInt("rules_" + level, 0) == 1;
+        public static void MarkRulesSeen(int level) => PlayerPrefs.SetInt("rules_" + level, 1);
+
         public static int Stars(int level)
         {
             var def = Levels.All[level];
             int best = Best(level), stars = 0;
-            for (int i = 0; i < def.StarScores.Length; i++) if (best >= def.StarScores[i]) stars = i + 1;
+            var th = def.Stars;
+            for (int i = 0; i < th.Length; i++) if (best >= th[i]) stars = i + 1;
             return stars;
         }
 
@@ -36,7 +40,7 @@ namespace HundredGame
 
         public static void ResetAll()
         {
-            for (int i = 0; i < Levels.All.Count; i++) { PlayerPrefs.DeleteKey("best_" + i); PlayerPrefs.DeleteKey("prog_" + i); }
+            for (int i = 0; i < Levels.All.Count; i++) { PlayerPrefs.DeleteKey("best_" + i); PlayerPrefs.DeleteKey("prog_" + i); PlayerPrefs.DeleteKey("rules_" + i); }
             PlayerPrefs.DeleteKey("played");
             PlayerPrefs.DeleteKey("placed");
             Save();
