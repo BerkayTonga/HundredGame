@@ -44,26 +44,26 @@ namespace HundredGame
 
         public GamePage(UIManager ui, Transform parent) : base(ui, "Game", parent)
         {
-            var back = UIKit.IconButton(Root, "Back", UIKit.Icon("back"), UIKit.CardLight, 120f, new Vector2(0f, 1f), new Vector2(90f, -100f));
+            var back = UIKit.IconButton(Root, "Back", UIKit.Icon("back"), UIKit.Slate, 120f, new Vector2(0f, 1f), new Vector2(90f, -100f));
             back.onClick.AddListener(() => ui.GoTo(ui.Levels, -1));
-            var gear = UIKit.IconButton(Root, "Gear", UIKit.Icon("gear"), UIKit.CardLight, 120f, new Vector2(1f, 1f), new Vector2(-90f, -100f));
+            var gear = UIKit.IconButton(Root, "Gear", UIKit.Icon("gear"), UIKit.Slate, 120f, new Vector2(1f, 1f), new Vector2(-90f, -100f));
             gear.onClick.AddListener(Popup.Settings);
-            var help = UIKit.IconButton(Root, "Help", UIKit.Icon("help"), UIKit.CardLight, 120f, new Vector2(1f, 1f), new Vector2(-230f, -100f));
+            var help = UIKit.IconButton(Root, "Help", UIKit.Icon("help"), UIKit.Slate, 120f, new Vector2(1f, 1f), new Vector2(-230f, -100f));
             help.onClick.AddListener(() => Popup.Help(_board != null ? _board.Def : null));
             Object.Destroy(help.transform.Find("Face/Icon").gameObject);
             UIKit.Label(help.transform.Find("Face"), "Q", "?", 72, Color.white);
 
-            _title = UIKit.Label(Root, "Title", "", 52, Color.white, TextAnchor.MiddleCenter, true);
+            _title = UIKit.Label(Root, "Title", "", 52, UIKit.Ink, TextAnchor.MiddleCenter);
             _title.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(-20f, -100f), new Vector2(440f, 100f));
 
             Stat("Score", "SKOR", -260f, out _score);
             Stat("Best", "REKOR", 260f, out _best);
 
             _boardRt = UIKit.Anchored(Root, "Board", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -30f), new Vector2(BoardPixels, BoardPixels));
-            var edge = UIKit.Panel(_boardRt, "Edge", UIKit.H("1E2D52"));
+            var edge = UIKit.Panel(_boardRt, "Edge", UIKit.BoardEdge);
             edge.rectTransform.offsetMin = new Vector2(-4f, -4f);
             edge.rectTransform.offsetMax = new Vector2(4f, 4f);
-            UIKit.Panel(_boardRt, "Bg", UIKit.H("0A1226"));
+            UIKit.Panel(_boardRt, "Bg", UIKit.BoardBg);
             _cellsRoot = UIKit.Fill(_boardRt, "Cells");
             _fx = UIKit.Fill(_boardRt, "Fx");
 
@@ -78,11 +78,11 @@ namespace HundredGame
         private void Stat(string name, string label, float x, out Text value)
         {
             var rt = UIKit.Anchored(Root, name, new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f), new Vector2(x, -270f), new Vector2(480f, 130f));
-            UIKit.Panel(rt, "Shadow", UIKit.H("060A16")).rectTransform.offsetMin = new Vector2(0f, -8f);
+            UIKit.Panel(rt, "Shadow", UIKit.H("DCCBB4")).rectTransform.offsetMin = new Vector2(0f, -8f);
             UIKit.Panel(rt, "Face", UIKit.Card);
             var l = UIKit.Label(rt, "Label", label, 28, UIKit.Muted, TextAnchor.MiddleLeft);
             l.rectTransform.SetAnchored(new Vector2(0f, 0.5f), new Vector2(150f, 0f), new Vector2(240f, 60f));
-            value = UIKit.Label(rt, "Value", "0", 76, Color.white, TextAnchor.MiddleRight, true);
+            value = UIKit.Label(rt, "Value", "0", 76, UIKit.Ink, TextAnchor.MiddleRight);
             value.rectTransform.SetAnchored(new Vector2(1f, 0.5f), new Vector2(-150f, 0f), new Vector2(240f, 110f));
         }
 
@@ -140,7 +140,7 @@ namespace HundredGame
             {
                 var r = _layout.Layers[z];
                 var panel = UIKit.Anchored(_cellsRoot, "Layer" + z, new Vector2(0.5f, 0.5f), new Vector2(0f, 0f), new Vector2(r.xMin, r.yMin), new Vector2(r.width, r.height));
-                UIKit.Panel(panel, "Bg", UIKit.H("0F1A33"));
+                UIKit.Panel(panel, "Bg", UIKit.H("DCCDB8"));
                 var label = UIKit.Label(panel, "Label", "KAT " + (z + 1), 26, UIKit.Muted, TextAnchor.MiddleLeft);
                 label.rectTransform.anchorMin = new Vector2(0f, 1f);
                 label.rectTransform.anchorMax = new Vector2(1f, 1f);
@@ -235,7 +235,7 @@ namespace HundredGame
             }
 
             int cur = _board.Current;
-            if (cur >= 0) _cells[cur].Ring.color = new Color(1f, 1f, 1f, 0.6f + 0.4f * Mathf.Sin(t * 4f));
+            if (cur >= 0) _cells[cur].Ring.color = new Color(UIKit.Ink.r, UIKit.Ink.g, UIKit.Ink.b, 0.55f + 0.45f * Mathf.Sin(t * 4f));
         }
 
         // ------------------------------------------------------------------ input
@@ -313,7 +313,7 @@ namespace HundredGame
             RefreshCell(idx);
             c.Ring.color = Color.clear;
             Anim.Scale(c.Rect, Vector3.one * 1.25f, Vector3.one, 0.25f, Anim.Ease.OutCubic);
-            UIFx.Ripple(_fx, CellPos(idx), new Color(1f, 1f, 1f, 0.3f), _layout.CellSize * 1.6f, _layout.CellSize * 0.6f, 0.3f);
+            UIFx.Ripple(_fx, CellPos(idx), new Color(UIKit.Ink.r, UIKit.Ink.g, UIKit.Ink.b, 0.2f), _layout.CellSize * 1.6f, _layout.CellSize * 0.6f, 0.3f);
             AudioManager.Sound(Sfx.Undo, 0.8f);
             Haptics.Light();
 
@@ -378,19 +378,17 @@ namespace HundredGame
         private void ShowResult(bool win)
         {
             if (!_ended || UI.PopupOpen) return;
-            int score = _board.Count, goal = _board.Def.Goal;
+            int score = _board.Count;
             bool record = score > _bestAtStart;
             var p = new Popup(900f, 1160f);
             var c = p.Card;
 
-            var title = UIKit.Label(c, "Title", win ? "TEBRİKLER!" : "HAMLE KALMADI", win ? 80 : 66, win ? UIKit.Gold : Color.white, TextAnchor.MiddleCenter, true);
+            var title = UIKit.Label(c, "Title", win ? "TEBRİKLER!" : "HAMLE KALMADI", win ? 80 : 66, win ? UIKit.Gold : UIKit.Ink, TextAnchor.MiddleCenter);
             title.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -110f), new Vector2(840f, 130f));
             Anim.Pop(title.transform, 0.5f, 1f, 0.5f, 0.1f);
 
-            var num = UIKit.Label(c, "Score", "0", 250, Color.white, TextAnchor.MiddleCenter, true);
-            num.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -330f), new Vector2(800f, 270f));
-            var of = UIKit.Label(c, "Of", "/ " + goal, 54, UIKit.Muted);
-            of.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -490f), new Vector2(500f, 70f));
+            var num = UIKit.Label(c, "Score", "0", 250, UIKit.Ink, TextAnchor.MiddleCenter);
+            num.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -360f), new Vector2(800f, 270f));
             Anim.Run(0.9f, e => { if (num != null) num.text = Mathf.RoundToInt(score * e).ToString(); }, null, 0.25f, Anim.Ease.OutCubic);
 
             var thresholds = _board.Def.Stars;
@@ -398,7 +396,7 @@ namespace HundredGame
             for (int s = 0; s < thresholds.Length; s++) if (score >= thresholds[s]) stars = s + 1;
             for (int s = 0; s < 3; s++)
             {
-                var star = UIKit.Sprite_(c, "Star" + s, UIKit.Star, s < stars ? UIKit.Gold : new Color(1f, 1f, 1f, 0.12f));
+                var star = UIKit.Sprite_(c, "Star" + s, UIKit.Star, s < stars ? UIKit.Gold : UIKit.H("E6DBCB"));
                 star.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2((s - 1) * 150f, -620f - (s == 1 ? -20f : 0f)), new Vector2(s == 1 ? 140f : 120f, s == 1 ? 140f : 120f));
                 if (s < stars)
                 {
@@ -429,7 +427,7 @@ namespace HundredGame
 
             if (win)
             {
-                var levels = UIKit.PillButton(c, "Levels", "Bölümler", UIKit.H("35508A"), new Vector2(660f, 120f), new Vector2(0.5f, 0f), new Vector2(0f, 100f), 46);
+                var levels = UIKit.PillButton(c, "Levels", "Bölümler", UIKit.Slate, new Vector2(660f, 120f), new Vector2(0.5f, 0f), new Vector2(0f, 100f), 46);
                 levels.onClick.AddListener(() => { p.Close(); UI.GoTo(UI.Levels, -1); });
             }
             else
@@ -437,7 +435,7 @@ namespace HundredGame
                 // nothing left to place: restart, or step back and try another route
                 var undo = UIKit.PillButton(c, "Undo", "Geri Al", UIKit.Blue, new Vector2(320f, 120f), new Vector2(0.5f, 0f), new Vector2(-170f, 100f), 46);
                 undo.onClick.AddListener(() => { p.Close(); Undo(); });
-                var levels = UIKit.PillButton(c, "Levels", "Bölümler", UIKit.H("35508A"), new Vector2(320f, 120f), new Vector2(0.5f, 0f), new Vector2(170f, 100f), 40);
+                var levels = UIKit.PillButton(c, "Levels", "Bölümler", UIKit.Slate, new Vector2(320f, 120f), new Vector2(0.5f, 0f), new Vector2(170f, 100f), 40);
                 levels.onClick.AddListener(() => { p.Close(); UI.GoTo(UI.Levels, -1); });
             }
 

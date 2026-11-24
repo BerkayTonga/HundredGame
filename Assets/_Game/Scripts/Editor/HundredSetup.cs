@@ -112,6 +112,14 @@ namespace HundredGame.Editor
         }
 
         // ------------------------------------------------------------------ headless rules check
+        [MenuItem("HundredGame/Reset Save Data")]
+        public static void ResetSave()
+        {
+            PlayerPrefs.DeleteAll();
+            PlayerPrefs.Save();
+            Debug.Log("[HundredGame] Save data cleared.");
+        }
+
         [MenuItem("HundredGame/Simulate Board")]
         public static void Simulate()
         {

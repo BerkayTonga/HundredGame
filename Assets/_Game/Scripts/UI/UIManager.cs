@@ -186,8 +186,8 @@ namespace HundredGame
             grad.sprite = UIKit.Gradient(UIKit.BgTop, UIKit.BgBottom);
             grad.raycastTarget = false;
 
-            _glowA = Glow("GlowA", new Color(UIKit.Blue.r, UIKit.Blue.g, UIKit.Blue.b, 0.16f), 1300f);
-            _glowB = Glow("GlowB", new Color(UIKit.Teal.r, UIKit.Teal.g, UIKit.Teal.b, 0.06f), 1100f);
+            _glowA = Glow("GlowA", new Color(UIKit.Gold.r, UIKit.Gold.g, UIKit.Gold.b, 0.22f), 1300f);
+            _glowB = Glow("GlowB", new Color(UIKit.Pink.r, UIKit.Pink.g, UIKit.Pink.b, 0.12f), 1100f);
 
             for (int i = 0; i < 10; i++)
             {
@@ -197,9 +197,9 @@ namespace HundredGame
                 var img = rt.gameObject.AddComponent<Image>();
                 img.sprite = UIKit.Rounded;
                 img.type = Image.Type.Sliced;
-                img.color = new Color(c.r, c.g, c.b, Random.Range(0.025f, 0.05f));
+                img.color = new Color(c.r, c.g, c.b, Random.Range(0.12f, 0.2f));
                 img.raycastTarget = false;
-                var t = UIKit.Label(rt, "N", Random.Range(1, 100).ToString(), (int)(size * 0.45f), new Color(1f, 1f, 1f, 0.05f));
+                var t = UIKit.Label(rt, "N", Random.Range(1, 100).ToString(), (int)(size * 0.45f), new Color(UIKit.Ink.r, UIKit.Ink.g, UIKit.Ink.b, 0.07f));
                 t.raycastTarget = false;
                 rt.anchoredPosition = new Vector2(Random.Range(-540f, 540f), Random.Range(-1000f, 1000f));
                 rt.localRotation = Quaternion.Euler(0f, 0f, Random.Range(-25f, 25f));

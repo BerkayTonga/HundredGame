@@ -12,27 +12,32 @@ namespace HundredGame
         // ------------------------------------------------------------------ palette
         public static Color H(string hex) { ColorUtility.TryParseHtmlString("#" + hex, out var c); return c; }
 
-        public static readonly Color BgTop = H("0F1A36");
-        public static readonly Color BgBottom = H("070C1A");
-        public static readonly Color Card = H("131D3A");
-        public static readonly Color CardLight = H("22345F");
-        public static readonly Color Cell = H("141F3D");
-        public static readonly Color Teal = H("2DE2C4");
-        public static readonly Color Pink = H("FF5C93");
-        public static readonly Color Gold = H("FFC947");
-        public static readonly Color Violet = H("3E8BFF");
-        public static readonly Color Blue = H("3E8BFF");
-        public static readonly Color Muted = H("8F98D0");
-        public static readonly Color Dark = H("0E1A33");
+        public static readonly Color BgTop = H("FFF8EC");
+        public static readonly Color BgBottom = H("FDE9D6");
+        public static readonly Color Card = H("FFFFFF");
+        public static readonly Color CardLight = H("F2E6D6");
+        public static readonly Color Cell = H("FBF6EE");
+        public static readonly Color BoardBg = H("E7DAC7");
+        public static readonly Color BoardEdge = H("D3C2AA");
+        public static readonly Color Teal = H("12C6A0");
+        public static readonly Color Pink = H("FF6B7F");
+        public static readonly Color Gold = H("FFB41F");
+        public static readonly Color Violet = H("4A90FF");
+        public static readonly Color Blue = H("4A90FF");
+        public static readonly Color Muted = H("9C8F82");
+        public static readonly Color Dark = H("2B2D42");
+        public static readonly Color Ink = H("2B2D42");
+        public static readonly Color Slate = H("3A3D5C");
 
         private static readonly Color[] Ramp =
         {
-            H("5CB6FF"), // sky blue
-            H("4FD8C4"), // mint
-            H("A4E070"), // lime
-            H("FFCB5E"), // amber
-            H("FF8F6B"), // coral
+            H("FF6B6B"), // coral
+            H("FF9F43"), // orange
+            H("FFD84D"), // sunny yellow
+            H("3FD9A0"), // green
+            H("4DB5FF"), // sky
         };
+
 
         /// <summary>Colour of a placed number: a soft ramp from sky blue through mint and lime to amber and coral.</summary>
         public static Color NumberColor(int n, int goal = 100)
@@ -423,6 +428,7 @@ namespace HundredGame
             var button = rt.gameObject.AddComponent<Button>();
             button.targetGraphic = face;
             button.transition = Selectable.Transition.None;
+            face.CrossFadeColor(Color.white, 0f, true, true);
             rt.gameObject.AddComponent<PressScale>();
             AddClick(button);
             return button;
@@ -516,7 +522,7 @@ namespace HundredGame
         private void Apply()
         {
             float e = Anim.Ease.InOutSine(_t);
-            _track.color = Color.Lerp(UIKit.H("3A4A70"), UIKit.Teal, e);
+            _track.color = Color.Lerp(UIKit.H("CFC3B4"), UIKit.Teal, e);
             _knob.anchoredPosition = new Vector2(Mathf.Lerp(36f, 100f, e), 0f);
         }
     }

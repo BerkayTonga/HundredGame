@@ -19,6 +19,7 @@ namespace HundredGame
             yield return new WaitForSeconds(3f);
             SaveData.MarkRulesSeen(0);
             SaveData.MarkRulesSeen(4);
+            SaveData.MarkRulesSeen(5);
 
             _cam = Camera.main;
             _cam.cullingMask = ~0;
@@ -85,18 +86,25 @@ namespace HundredGame
 
             UIManager.I.OpenLevel(1);
             yield return new WaitForSeconds(2.4f);
-            yield return Shot("cube_rules");
+            yield return Shot("elmas_rules");
             UIManager.I.Back();
             yield return new WaitForSeconds(0.5f);
             for (int k = 0; k < 14; k++) { game.OnCell(game.Board.Hint()); yield return new WaitForSeconds(0.1f); }
             yield return new WaitForSeconds(0.4f);
-            yield return Shot("cube");
+            yield return Shot("elmas");
+
+            UIManager.I.GoTo(UIManager.I.Levels, -1);
+            yield return new WaitForSeconds(1.2f);
+            UIManager.I.OpenLevel(5);
+            yield return new WaitForSeconds(1.8f);
+            for (int k = 0; k < 22; k++) { game.OnCell(game.Board.Hint()); yield return new WaitForSeconds(0.08f); }
+            yield return new WaitForSeconds(0.5f);
+            yield return Shot("adalar");
 
             UIManager.I.GoTo(UIManager.I.Levels, -1);
             yield return new WaitForSeconds(1.2f);
             UIManager.I.OpenLevel(4);
             yield return new WaitForSeconds(2.4f);
-            UIManager.I.Back();
             yield return new WaitForSeconds(0.5f);
             var rng = new System.Random(3);
             var moves = new System.Collections.Generic.List<int>();
@@ -112,6 +120,8 @@ namespace HundredGame
             yield return Shot("lose");
             Debug.Log("[Smoke] ring random ended at " + game.Board.Count);
             Debug.Log("[Smoke] finished");
+            PlayerPrefs.DeleteAll(); // the bot must not leave records behind
+            PlayerPrefs.Save();
             if (System.Environment.CommandLine.Contains("-executeMethod")) UnityEditor.EditorApplication.Exit(0);
             else UnityEditor.EditorApplication.isPlaying = false;
         }

@@ -81,7 +81,7 @@ namespace HundredGame
 
         public static void Confetti(Transform parent, int count, float width, float height)
         {
-            Color[] palette = { UIKit.Teal, UIKit.Pink, UIKit.Gold, UIKit.Violet, UIKit.Blue, Color.white };
+            Color[] palette = { UIKit.Teal, UIKit.Pink, UIKit.Gold, UIKit.Violet, UIKit.Blue, UIKit.H("FF9F43") };
             for (int i = 0; i < count; i++)
             {
                 Vector2 start = new Vector2(Random.Range(-width * 0.5f, width * 0.5f), height * 0.5f + Random.Range(0f, 200f));

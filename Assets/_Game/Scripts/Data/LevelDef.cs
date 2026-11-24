@@ -87,9 +87,9 @@ namespace HundredGame
             },
             new LevelDef
             {
-                Name = "Küp", Subtitle = "3 boyut: 4 kat, 5 × 5",
-                Rule = "Her yönde aynı kural: 3 kare ileri ya da 2 kare çapraz.\nKatlar arasında da geçerli.",
-                SX = 5, SY = 5, SZ = 4, Offsets = Offsets.Build(3, 2, true),
+                Name = "Elmas", Subtitle = "Elmas biçimli tahta",
+                Rule = "Klasik kurallar. Köşeler kapalı, tahta elmas şeklinde.",
+                SX = 12, SY = 12, Blocked = Diamond(12, 8), Offsets = Offsets.Build(3, 2, false),
             },
             new LevelDef
             {
@@ -109,6 +109,12 @@ namespace HundredGame
                 Rule = "Klasik kurallar. Ortadaki boşluğu aşıp atlayabilirsin.",
                 SX = 11, SY = 11, Blocked = CenterHole(11, 5), Offsets = Offsets.Build(3, 2, false),
             },
+            new LevelDef
+            {
+                Name = "Adalar", Subtitle = "4 ada, 100 kare",
+                Rule = "Klasik kurallar. Adalar arasındaki suyu 3 kare düz atlayarak geç.",
+                SX = 12, SY = 12, Blocked = Channels(12, 5, 2), Offsets = Offsets.Build(3, 2, false),
+            },
         };
 
         /// <summary>Cells of a square hole in the middle of an n × n board.</summary>
@@ -118,6 +124,29 @@ namespace HundredGame
             int a = (n - hole) / 2;
             for (int y = a; y < a + hole; y++)
             for (int x = a; x < a + hole; x++) list.Add(y * n + x);
+            return list.ToArray();
+        }
+
+        /// <summary>Corner cells removed so that an n × n board becomes a diamond.</summary>
+        public static int[] Diamond(int n, int radius)
+        {
+            var list = new List<int>();
+            for (int y = 0; y < n; y++)
+            for (int x = 0; x < n; x++)
+            {
+                float dx = x - (n - 1) / 2f, dy = y - (n - 1) / 2f;
+                if (System.Math.Abs(dx) + System.Math.Abs(dy) > radius - 0.5f) list.Add(y * n + x);
+            }
+            return list.ToArray();
+        }
+
+        /// <summary>A vertical and a horizontal channel that split the board into four islands.</summary>
+        public static int[] Channels(int n, int start, int width)
+        {
+            var list = new List<int>();
+            for (int y = 0; y < n; y++)
+            for (int x = 0; x < n; x++)
+                if ((x >= start && x < start + width) || (y >= start && y < start + width)) list.Add(y * n + x);
             return list.ToArray();
         }
     }

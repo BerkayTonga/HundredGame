@@ -23,7 +23,7 @@ namespace HundredGame
             _root = rt.gameObject;
             _group = _root.AddComponent<CanvasGroup>();
 
-            var dim = UIKit.Panel(rt, "Dim", new Color(0.02f, 0.03f, 0.1f, 0.78f), false);
+            var dim = UIKit.Panel(rt, "Dim", new Color(0.25f, 0.17f, 0.1f, 0.55f), false);
             dim.raycastTarget = true;
             if (dismissOnBackdrop) dim.gameObject.AddComponent<BackdropClick>().Owner = this;
 
@@ -34,7 +34,7 @@ namespace HundredGame
             borderImg.color = UIKit.CardLight;
             borderImg.raycastTarget = true;
             Card = UIKit.Rect(border, "Inner", Vector2.zero, Vector2.one, new Vector2(5f, 5f), new Vector2(-5f, -5f));
-            var innerRounded = UIKit.Panel(Card, "Bg", UIKit.H("162A52"));
+            var innerRounded = UIKit.Panel(Card, "Bg", UIKit.Card);
             innerRounded.rectTransform.SetAsFirstSibling();
 
             _group.alpha = 0f;
@@ -65,7 +65,7 @@ namespace HundredGame
         {
             var p = new Popup(900f, 1180f);
             var c = p.Card;
-            UIKit.Label(c, "Title", "AYARLAR", 72, Color.white, TextAnchor.MiddleCenter, true).rectTransform
+            UIKit.Label(c, "Title", "AYARLAR", 72, UIKit.Ink, TextAnchor.MiddleCenter).rectTransform
                 .SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -100f), new Vector2(800f, 120f));
 
             float y = -270f;
@@ -73,7 +73,7 @@ namespace HundredGame
             Row(c, "Müzik", SaveData.MusicOn, v => { SaveData.MusicOn = v; SaveData.Save(); AudioManager.Instance?.ApplySettings(); }, ref y);
             Row(c, "Titreşim", SaveData.VibrationOn, v => { SaveData.VibrationOn = v; SaveData.Save(); if (v) Haptics.Medium(); }, ref y);
 
-            var reset = UIKit.PillButton(c, "Reset", "İlerlemeyi Sıfırla", UIKit.H("7A3C4F"), new Vector2(620f, 120f), new Vector2(0.5f, 1f), new Vector2(0f, y - 40f), 40);
+            var reset = UIKit.PillButton(c, "Reset", "İlerlemeyi Sıfırla", UIKit.Pink, new Vector2(620f, 120f), new Vector2(0.5f, 1f), new Vector2(0f, y - 40f), 40);
             bool armed = false;
             var resetLabel = reset.GetComponentInChildren<Text>();
             reset.onClick.AddListener(() =>
@@ -99,8 +99,8 @@ namespace HundredGame
         private static void Row(RectTransform c, string label, bool value, Action<bool> changed, ref float y)
         {
             var row = UIKit.Anchored(c, "Row", new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f), new Vector2(0f, y), new Vector2(760f, 120f));
-            UIKit.Panel(row, "Bg", new Color(1f, 1f, 1f, 0.06f));
-            var t = UIKit.Label(row, "Label", label, 46, Color.white, TextAnchor.MiddleLeft);
+            UIKit.Panel(row, "Bg", UIKit.H("F5EDE1"));
+            var t = UIKit.Label(row, "Label", label, 46, UIKit.Ink, TextAnchor.MiddleLeft);
             t.rectTransform.offsetMin = new Vector2(40f, 0f);
             Switch.Create(row, "Switch", new Vector2(1f, 0.5f), new Vector2(-100f, 0f), value, changed);
             y -= 150f;
@@ -111,7 +111,7 @@ namespace HundredGame
             def = def ?? Levels.All[0];
             var p = new Popup(940f, 1420f);
             var c = p.Card;
-            UIKit.Label(c, "Title", "NASIL OYNANIR?", 68, Color.white, TextAnchor.MiddleCenter, true).rectTransform
+            UIKit.Label(c, "Title", "NASIL OYNANIR?", 68, UIKit.Ink, TextAnchor.MiddleCenter).rectTransform
                 .SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -90f), new Vector2(860f, 120f));
 
             var body = UIKit.Label(c, "Body",
@@ -126,7 +126,7 @@ namespace HundredGame
             float cell = 76f, gap = 8f;
             float size = grid * cell + (grid - 1) * gap;
             var board = UIKit.Anchored(c, "Diagram", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -360f), new Vector2(size + 36f, size + 36f));
-            UIKit.Panel(board, "Bg", new Color(0f, 0f, 0.1f, 0.35f));
+            UIKit.Panel(board, "Bg", UIKit.BoardBg);
             for (int gy = 0; gy < grid; gy++)
             for (int gx = 0; gx < grid; gx++)
             {
@@ -147,7 +147,7 @@ namespace HundredGame
 
             var rules = UIKit.Label(c, "Rules",
                 def.Rule,
-                40, Color.white, TextAnchor.UpperCenter);
+                40, UIKit.Ink, TextAnchor.UpperCenter);
             rules.horizontalOverflow = HorizontalWrapMode.Wrap;
             rules.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -360f - size - 70f), new Vector2(840f, 140f));
             rules.rectTransform.pivot = new Vector2(0.5f, 1f);
@@ -160,13 +160,13 @@ namespace HundredGame
         {
             var p = new Popup(860f, 640f);
             var c = p.Card;
-            UIKit.Label(c, "Title", title, 64, Color.white, TextAnchor.MiddleCenter, true).rectTransform
+            UIKit.Label(c, "Title", title, 64, UIKit.Ink, TextAnchor.MiddleCenter).rectTransform
                 .SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -100f), new Vector2(780f, 120f));
             var msg = UIKit.Label(c, "Msg", message, 40, UIKit.Muted);
             msg.horizontalOverflow = HorizontalWrapMode.Wrap;
             msg.rectTransform.SetAnchored(new Vector2(0.5f, 0.5f), new Vector2(0f, 20f), new Vector2(740f, 200f));
 
-            var no = UIKit.PillButton(c, "No", "Vazgeç", UIKit.H("3A5080"), new Vector2(340f, 120f), new Vector2(0.5f, 0f), new Vector2(-190f, 110f), 46);
+            var no = UIKit.PillButton(c, "No", "Vazgeç", UIKit.Slate, new Vector2(340f, 120f), new Vector2(0.5f, 0f), new Vector2(-190f, 110f), 46);
             no.onClick.AddListener(p.Close);
             var ok = UIKit.PillButton(c, "Yes", yes, UIKit.Pink, new Vector2(340f, 120f), new Vector2(0.5f, 0f), new Vector2(190f, 110f), 46);
             ok.onClick.AddListener(() => { p.Close(); onYes?.Invoke(); });

@@ -64,7 +64,7 @@ namespace HundredGame
             play.onClick.AddListener(() => ui.GoTo(ui.Levels, 1));
             _buttons[0] = (RectTransform)play.transform;
 
-            var how = UIKit.PillButton(Root, "How", "Nasıl Oynanır?", UIKit.H("35508A"), new Vector2(420f, 130f), new Vector2(0.5f, 0.5f), new Vector2(-225f, -400f), 38);
+            var how = UIKit.PillButton(Root, "How", "Nasıl Oynanır?", UIKit.Slate, new Vector2(420f, 130f), new Vector2(0.5f, 0.5f), new Vector2(-225f, -400f), 38);
             how.onClick.AddListener(() => Popup.Help(null));
             _buttons[1] = (RectTransform)how.transform;
 
@@ -117,10 +117,10 @@ namespace HundredGame
 
         public LevelsPage(UIManager ui, Transform parent) : base(ui, "Levels", parent)
         {
-            var back = UIKit.IconButton(Root, "Back", UIKit.Icon("back"), UIKit.CardLight, 120f, new Vector2(0f, 1f), new Vector2(90f, -100f));
+            var back = UIKit.IconButton(Root, "Back", UIKit.Icon("back"), UIKit.Slate, 120f, new Vector2(0f, 1f), new Vector2(90f, -100f));
             back.onClick.AddListener(() => ui.GoTo(ui.Menu, -1));
 
-            var title = UIKit.Label(Root, "Title", "BÖLÜMLER", 78, Color.white, TextAnchor.MiddleCenter, true);
+            var title = UIKit.Label(Root, "Title", "BÖLÜMLER", 78, UIKit.Ink, TextAnchor.MiddleCenter);
             title.rectTransform.SetAnchored(new Vector2(0.5f, 1f), new Vector2(0f, -100f), new Vector2(700f, 130f));
 
 
@@ -144,14 +144,15 @@ namespace HundredGame
         {
             var def = Levels.All[index];
             var rt = UIKit.Anchored(_content, "Card" + index, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, y), new Vector2(980f, height));
-            var shadow = UIKit.Panel(rt, "Shadow", UIKit.H("08101F"));
+            var shadow = UIKit.Panel(rt, "Shadow", UIKit.H("DCCBB4"));
             shadow.rectTransform.offsetMin = new Vector2(0f, -12f);
             shadow.rectTransform.offsetMax = new Vector2(0f, -12f);
-            var face = UIKit.Panel(rt, "Face", UIKit.H("243A70"));
+            var face = UIKit.Panel(rt, "Face", UIKit.Card);
             face.raycastTarget = true;
             var btn = rt.gameObject.AddComponent<Button>();
             btn.targetGraphic = face;
             btn.transition = Selectable.Transition.None;
+            face.CrossFadeColor(Color.white, 0f, true, true); // undo the "disabled" tint a button gets when created under a non-interactable group
             rt.gameObject.AddComponent<PressScale>();
             int captured = index;
             btn.onClick.AddListener(() => { AudioManager.Sound(Sfx.Click, 0.7f); UI.OpenLevel(captured); });
@@ -161,7 +162,7 @@ namespace HundredGame
             // progress preview: the grid fills with colour as the best score grows
             const float size = 240f;
             var preview = UIKit.Anchored(face.transform, "Preview", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(46f, 0f), new Vector2(size, size));
-            UIKit.Panel(preview, "Bg", new Color(0f, 0f, 0.08f, 0.45f));
+            UIKit.Panel(preview, "Bg", UIKit.H("EFE5D6"));
             var layout = BoardLayout.Create(def, size, 10f, 3f, 0f);
             var blocked = new System.Collections.Generic.HashSet<int>(def.Blocked);
             int order = 0;
@@ -185,7 +186,7 @@ namespace HundredGame
             tag.rectTransform.pivot = new Vector2(0f, 0.5f);
             tag.rectTransform.anchoredPosition = new Vector2(0f, -44f);
 
-            var name = UIKit.Label(info, "Name", def.Name, 68, Color.white, TextAnchor.MiddleLeft, true);
+            var name = UIKit.Label(info, "Name", def.Name, 68, UIKit.Ink, TextAnchor.MiddleLeft);
             name.rectTransform.SetAnchored(new Vector2(0f, 1f), new Vector2(0f, -104f), new Vector2(520f, 90f));
             name.rectTransform.pivot = new Vector2(0f, 0.5f);
 
@@ -197,17 +198,17 @@ namespace HundredGame
             int stars = SaveData.Stars(index);
             for (int s = 0; s < 3; s++)
             {
-                var star = UIKit.Sprite_(info, "Star" + s, UIKit.Star, s < stars ? UIKit.Gold : new Color(1f, 1f, 1f, 0.14f));
+                var star = UIKit.Sprite_(info, "Star" + s, UIKit.Star, s < stars ? UIKit.Gold : UIKit.H("E6DBCB"));
                 star.rectTransform.SetAnchored(new Vector2(0f, 0f), new Vector2(30f + s * 60f, 118f), new Vector2(54f, 54f));
             }
 
             // best score + bar
-            var bestText = UIKit.Label(info, "Best", best > 0 ? "Rekor " + best + " / " + def.Goal : "Henüz oynanmadı", 32, Color.white, TextAnchor.MiddleLeft);
+            var bestText = UIKit.Label(info, "Best", best > 0 ? "Rekor: " + best : "Henüz oynanmadı", 32, UIKit.Ink, TextAnchor.MiddleLeft);
             bestText.rectTransform.SetAnchored(new Vector2(0f, 0f), new Vector2(0f, 58f), new Vector2(520f, 44f));
             bestText.rectTransform.pivot = new Vector2(0f, 0.5f);
 
             var track = UIKit.Anchored(info, "Track", new Vector2(0f, 0f), new Vector2(0f, 0.5f), new Vector2(0f, 26f), new Vector2(430f, 18f));
-            UIKit.Panel(track, "Bg", new Color(1f, 1f, 1f, 0.1f));
+            UIKit.Panel(track, "Bg", UIKit.H("EDE2D2"));
             var fill = UIKit.Panel(track, "Fill", UIKit.Teal);
             fill.rectTransform.anchorMax = new Vector2(Mathf.Clamp01(best / (float)def.Goal), 1f);
 
@@ -224,12 +225,13 @@ namespace HundredGame
         private void BuildSoon(int index, float y, float height)
         {
             var rt = UIKit.Anchored(_content, "Soon", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, y), new Vector2(980f, height));
-            var face = UIKit.Panel(rt, "Face", new Color(1f, 1f, 1f, 0.05f));
+            var face = UIKit.Panel(rt, "Face", new Color(0.45f, 0.35f, 0.2f, 0.08f));
             face.raycastTarget = true;
-            UIKit.Label(rt, "T", "Yakında", 66, new Color(1f, 1f, 1f, 0.55f)).rectTransform.SetAnchored(new Vector2(0.5f, 0.5f), new Vector2(0f, 0f), new Vector2(800f, 100f));
+            UIKit.Label(rt, "T", "Yakında", 66, UIKit.Muted).rectTransform.SetAnchored(new Vector2(0.5f, 0.5f), new Vector2(0f, 0f), new Vector2(800f, 100f));
             var btn = rt.gameObject.AddComponent<Button>();
             btn.targetGraphic = face;
             btn.transition = Selectable.Transition.None;
+            face.CrossFadeColor(Color.white, 0f, true, true); // undo the "disabled" tint a button gets when created under a non-interactable group
             Anim.Move(rt, new Vector2(0f, y - 70f), new Vector2(0f, y), 0.5f, Anim.Ease.OutBack, 0.08f * index);
         }
     }
