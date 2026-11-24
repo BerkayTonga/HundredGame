@@ -18,6 +18,7 @@ namespace HundredGame.Editor
             Directory.CreateDirectory("Assets/_Game/Scenes");
             CreateScene();
             CreateIcon();
+            ConfigureRenderPipeline();
             ConfigurePlayer();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -41,6 +42,18 @@ namespace HundredGame.Editor
             new GameObject("GameBootstrap").AddComponent<GameBootstrap>();
             EditorSceneManager.SaveScene(scene, ScenePath);
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
+        }
+
+        private static void ConfigureRenderPipeline()
+        {
+            var rp = AssetDatabase.LoadAssetAtPath<UnityEngine.Rendering.RenderPipelineAsset>("Assets/_Game/Settings/Mobile_RPAsset.asset");
+            if (rp == null) return;
+            UnityEngine.Rendering.GraphicsSettings.defaultRenderPipeline = rp;
+            for (int i = 0; i < QualitySettings.names.Length; i++)
+            {
+                QualitySettings.SetQualityLevel(i, false);
+                QualitySettings.renderPipeline = rp;
+            }
         }
 
         private static void ConfigurePlayer()

@@ -4,7 +4,7 @@
 
 **A modern, animated number-placement puzzle for mobile.** Fill a 10 × 10 grid with the numbers 1 to 100 in order. Sounds easy, but every number has to jump to a very specific square, and one wrong turn leaves you stuck. How far can you get?
 
-![Unity](https://img.shields.io/badge/Unity-6000.6-black?logo=unity) ![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-green) ![Language](https://img.shields.io/badge/UI-Turkish-red) ![License](https://img.shields.io/badge/License-MIT-yellow)
+![Unity](https://img.shields.io/badge/Unity-6000.6-black?logo=unity) ![Render Pipeline](https://img.shields.io/badge/URP-17.6-blue) ![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-green) ![Language](https://img.shields.io/badge/UI-Turkish-red) ![License](https://img.shields.io/badge/License-MIT-yellow)
 
 <p align="center">
   <img src="docs/screenshots/menu.png" width="190" alt="Main menu">

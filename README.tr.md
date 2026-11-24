@@ -4,7 +4,7 @@
 
 **Mobil için modern, animasyonlu sayı yerleştirme bulmacası.** 10 × 10'luk tahtayı 1'den 100'e kadar sırayla sayılarla doldur. Kulağa kolay geliyor, ama her sayı belirli bir kareye atlamak zorunda ve tek bir yanlış hamle seni sıkıştırır. Sen kaça kadar gidebilirsin?
 
-![Unity](https://img.shields.io/badge/Unity-6000.6-black?logo=unity) ![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-green) ![Language](https://img.shields.io/badge/UI-Turkish-red) ![License](https://img.shields.io/badge/License-MIT-yellow)
+![Unity](https://img.shields.io/badge/Unity-6000.6-black?logo=unity) ![Render Pipeline](https://img.shields.io/badge/URP-17.6-blue) ![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-green) ![Language](https://img.shields.io/badge/UI-Turkish-red) ![License](https://img.shields.io/badge/License-MIT-yellow)
 
 <p align="center">
   <img src="docs/screenshots/menu.png" width="190" alt="Ana menü">
